@@ -48,14 +48,14 @@ public class PanelFromages extends JPanel {
     private static final long serialVersionUID = 1L;
 
     // Palette de couleurs
-    private static final Color COULEUR_FOND        = new Color(250, 245, 235);
-    private static final Color COULEUR_MARRON       = new Color(101, 67, 33);
-    private static final Color COULEUR_MARRON_CLAIR = new Color(180, 130, 70);
-    private static final Color COULEUR_LISTE        = new Color(255, 252, 245);
-    private static final Color COULEUR_TEXTE        = new Color(60, 40, 20);
+    public static final Color COULEUR_FOND        = new Color(250, 245, 235);
+    public static final Color COULEUR_MARRON       = new Color(101, 67, 33);
+    public static final Color COULEUR_MARRON_CLAIR = new Color(180, 130, 70);
+    public static final Color COULEUR_LISTE        = new Color(255, 252, 245);
+    public static final Color COULEUR_TEXTE        = new Color(60, 40, 20);
 
     private Fromages base;
-    private Panier panier;
+    public Panier panier;
 
     // --- Zone gauche ---
     private DefaultListModel<Fromage> modèleListe;
@@ -466,4 +466,20 @@ public class PanelFromages extends JPanel {
         this.panier.ajouterArticle(article, quantité);
         afficherArticle(article);
     }
+    /**
+     * Permet de mettre à jour dynamiquement l'affichage du stock
+     * lorsque les quantités bougent dans l'interface du panier.
+     */
+    @Responsable("Zeineb ESSEGHAIER & BOULIFA Zaynab")
+    public void actualiserStockLabel(Article articleModifie) {
+        if (this.articlesFromageCourant != null) {
+            for (Article a : this.articlesFromageCourant) {
+                if (a.equals(articleModifie)) {
+                    this.lblStock.setText(String.valueOf(a.getQuantitéEnStock()));
+                    break;
+                }
+            }
+        }
+    }
+    
 }
