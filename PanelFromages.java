@@ -485,7 +485,7 @@ public class PanelFromages extends JPanel {
         this.articlesFromageCourant = null;
     }
 
-    @Responsable("Zeineb ESSEGHAIER")
+    @Responsable("Zeineb ESSEGHAIER & Zaynab BOULIFA")
     private void ajouterAuPanier() {
         if (this.articlesFromageCourant == null || this.articlesFromageCourant.isEmpty()) {
             return;
@@ -505,7 +505,7 @@ public class PanelFromages extends JPanel {
         this.panier.ajouterArticle(article, quantité);
         afficherArticle(article);
         
-        // --- NOUVEAUTÉ : Mise à jour du prix sur le bouton en direct ---
+        // Mise à jour du prix sur le bouton en direct ---
         if (this.btnPanierMain != null) {
             this.btnPanierMain.setText("🛒 Gestion du panier (" + String.format("%.2f €", this.panier.calculerTotalTTC()) + ")");
        

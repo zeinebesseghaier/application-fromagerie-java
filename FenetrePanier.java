@@ -22,6 +22,7 @@ import modele.Article;
 import modele.LigneCommande;
 import modele.Panier;
 
+
 public class FenetrePanier extends JDialog {
 
     private static final long serialVersionUID = 1L;
@@ -61,9 +62,11 @@ public class FenetrePanier extends JDialog {
 
         // Configuration de la table (non éditable)
         String[] colonnes = {"Article", "Quantité", "Prix TTC"};
+        
         modeleTable = new DefaultTableModel(colonnes, 0) {
             private static final long serialVersionUID = 1L;
             @Override
+            @Responsable("Zaynab BOULIFA")
             public boolean isCellEditable(int row, int column) { return false; }
         };
 
@@ -243,26 +246,61 @@ public class FenetrePanier extends JDialog {
     }
 
 
+    /**
+     * Calcule les totaux et applique la grille tarifaire dynamique des transporteurs
+     */
+    @Responsable("Zaynab BOULIFA")
     public void actualiserTousLesTotaux() {
         double total = panier.calculerTotalTTC();
         lblTotal.setText(" Total fromages : " + String.format("%.2f €", total));
         
         double frais = 0.0;
+        
+        // Les frais de port sont offerts dès 120 € d'achats pour TOUS les transporteurs
         if (total > 0 && total < 120.0) {
             int index = comboPort.getSelectedIndex();
-            if (index == 0) frais = 4.90;
-            else if (index == 1) frais = 5.90;
-            else if (index == 2) frais = 9.90;
+            
+            if (index == 0) { // Colissimo
+                if (total < 60.0) {
+                    frais = 14.90;
+                } else if (total < 90.0) {
+                    frais = 9.90;
+                } else { // entre 90 € et moins de 120 €
+                    frais = 4.90;
+                }
+            } 
+            else if (index == 1) { // Chronorelais
+                if (total < 60.0) {
+                    frais = 14.90;
+                } else if (total < 90.0) {
+                    frais = 9.90;
+                } else { // entre 90 € et moins de 120 €
+                    frais = 4.90;
+                }
+            } 
+            else if (index == 2) { // Chronofresh
+                if (total < 50.0) {
+                    frais = 23.80;
+                } else if (total < 80.0) {
+                    frais = 17.80;
+                } else { // entre 80 € et moins de 120 €
+                    frais = 9.90;
+                }
+            }
         }
         
-        double totalFinal = (total >= 120.0 || total == 0) ? total : total + frais;
+        // Si le panier est vide (total == 0), les frais restent à 0
+        double totalFinal = (total == 0) ? 0.0 : total + frais;
         lblTotalTransport.setText(" TOTAL AVEC TRANSPORT : " + String.format("%.2f €", totalFinal));
         
-        // On met à jour le bouton d'IHM principale passé en paramètre
+        // Rappel visuel de la formule dans l'IHM
         if (btnPanierMain != null) {
             btnPanierMain.setText("🛒 Gestion du panier (" + String.format("%.2f €", total) + ")");
             btnPanierMain.repaint();
         }
         
+        if (panelFromages != null) {
+            panelFromages.repaint();
+        }
     }
 }

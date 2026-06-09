@@ -75,6 +75,7 @@ public class FenetreConfirmation extends JDialog {
     }
 
     // Getter permettant à FenetrePanier de récupérer la réponse
+    @Responsable("Zaynab BOULIFA")
     public boolean isConfirme() {
         return confirme;
     }
