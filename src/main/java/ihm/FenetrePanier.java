@@ -45,7 +45,7 @@ public class FenetrePanier extends JDialog {
 
     @Responsable("Zaynab BOULIFA")
     public FenetrePanier(JFrame parent, Panier panier, PanelFromages panelFromages, JButton btnPanierMain) {
-        super(parent, "Mon Panier", true); // Fenêtre modale
+        super(parent, "Mon Panier", true);
         
         this.panier = panier;
         this.panelFromages = panelFromages;
@@ -54,13 +54,11 @@ public class FenetrePanier extends JDialog {
         setSize(600, 550);
         setLocationRelativeTo(parent);
 
-        // Conteneur principal
         JPanel conteneur = new JPanel(new BorderLayout(10, 10));
         conteneur.setBackground(PanelFromages.COULEUR_FOND);
         conteneur.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
         setContentPane(conteneur);
 
-        // Configuration de la table (non éditable)
         String[] colonnes = {"Article", "Quantité", "Prix TTC"};
         
         modeleTable = new DefaultTableModel(colonnes, 0) {
@@ -70,7 +68,6 @@ public class FenetrePanier extends JDialog {
             public boolean isCellEditable(int row, int column) { return false; }
         };
 
-        // Style de la table
         table = new JTable(modeleTable);
         table.setRowHeight(35);
         table.setBackground(PanelFromages.COULEUR_LISTE);
@@ -85,7 +82,6 @@ public class FenetrePanier extends JDialog {
         table.getTableHeader().setForeground(Color.WHITE);
         table.getTableHeader().setFont(new Font("Serif", Font.BOLD, 14));
 
-        // Remplissage initial de la table
         for (LigneCommande ligne : panier.getLignesCommande()) {
             Object[] ligneDonnees = {
                 ligne.getArticle().getFromage().getDésignation(),
@@ -100,26 +96,22 @@ public class FenetrePanier extends JDialog {
         scrollPane.getViewport().setBackground(PanelFromages.COULEUR_LISTE);
         conteneur.add(scrollPane, BorderLayout.CENTER);
 
-        // Zone du bas (Totaux et commandes)
         JPanel panelBas = new JPanel(new GridLayout(0, 1, 5, 5));
         panelBas.setBackground(PanelFromages.COULEUR_FOND);
         conteneur.add(panelBas, BorderLayout.SOUTH);
 
-        // Label Sous-Total
         lblTotal = new JLabel();
         lblTotal.setFont(new Font("Serif", Font.PLAIN, 15));
         lblTotal.setForeground(PanelFromages.COULEUR_MARRON);
         lblTotal.setHorizontalAlignment(SwingConstants.CENTER);
         panelBas.add(lblTotal);
 
-        // Label Promo
         JLabel lblPromo = new JLabel("✨ Frais de port offerts à partir de 120 € d'achats !");
         lblPromo.setFont(new Font("Serif", Font.ITALIC, 14));
         lblPromo.setForeground(PanelFromages.COULEUR_MARRON_CLAIR);
         lblPromo.setHorizontalAlignment(SwingConstants.CENTER);
         panelBas.add(lblPromo);
 
-        // Mode d'expédition
         JPanel panelTransport = new JPanel(new FlowLayout(FlowLayout.CENTER));
         panelTransport.setBackground(PanelFromages.COULEUR_FOND);
         JLabel lblExpedition = new JLabel("Expédition : ");
@@ -133,18 +125,15 @@ public class FenetrePanier extends JDialog {
         panelTransport.add(comboPort);
         panelBas.add(panelTransport);
 
-        // Label Grand Total
         lblTotalTransport = new JLabel();
         lblTotalTransport.setFont(new Font("Serif", Font.BOLD, 18));
         lblTotalTransport.setForeground(PanelFromages.COULEUR_MARRON);
         lblTotalTransport.setHorizontalAlignment(SwingConstants.CENTER);
         panelBas.add(lblTotalTransport);
 
-        // Premier calcul au lancement
         actualiserTousLesTotaux();
         comboPort.addActionListener(e -> actualiserTousLesTotaux());
 
-        // Boutons de modification des quantités
         JPanel panelControles = new JPanel(new FlowLayout(FlowLayout.CENTER, 15, 5));
         panelControles.setBackground(PanelFromages.COULEUR_FOND);
         JLabel lblModif = new JLabel("Modifier la quantité : ");
@@ -152,7 +141,6 @@ public class FenetrePanier extends JDialog {
         lblModif.setForeground(PanelFromages.COULEUR_TEXTE);
         panelControles.add(lblModif);
 
-        // Action du bouton Moins (-)
         btnMoins = new JButton("-");
         btnMoins.setBackground(PanelFromages.COULEUR_MARRON_CLAIR);
         btnMoins.setForeground(Color.WHITE);
@@ -174,7 +162,6 @@ public class FenetrePanier extends JDialog {
         });
         panelControles.add(btnMoins);
 
-        // Action du bouton Plus (+)
         btnPlus = new JButton("+");
         btnPlus.setBackground(PanelFromages.COULEUR_MARRON_CLAIR);
         btnPlus.setForeground(Color.WHITE);
@@ -199,7 +186,6 @@ public class FenetrePanier extends JDialog {
         panelControles.add(btnPlus);
         panelBas.add(panelControles);
 
-        // Action du bouton Vider avec la JDialog de confirmation propre
         btnVider = new JButton("🗑 Tout enlever");
         btnVider.setBackground(new Color(101, 67, 33));
         btnVider.setForeground(new Color(255, 255, 255));
@@ -224,7 +210,6 @@ public class FenetrePanier extends JDialog {
             }
         });
 
-        // Action du bouton Continuer
         btnContinuer = new JButton("Continuer mes achats");
         btnContinuer.setBackground(PanelFromages.COULEUR_MARRON);
         btnContinuer.setForeground(Color.WHITE);
@@ -239,10 +224,21 @@ public class FenetrePanier extends JDialog {
         panelAction.add(btnContinuer, BorderLayout.EAST);
         panelBas.add(panelAction);
         
-        JButton ValiderCmd = new JButton("Valider la commande");
-        ValiderCmd.setForeground(new Color(255, 255, 255));
-        ValiderCmd.setBackground(new Color(101, 67, 33));
-        panelAction.add(ValiderCmd, BorderLayout.CENTER);
+        JButton btnValiderCmd = new JButton("Valider la commande");
+        btnValiderCmd.setForeground(new Color(255, 255, 255));
+        btnValiderCmd.setBackground(new Color(101, 67, 33));
+        // action branchée sur le bouton Valider
+        btnValiderCmd.addActionListener(e -> {
+            if (!panier.getLignesCommande().isEmpty()) {
+                dispose();
+            } else {
+                javax.swing.JOptionPane.showMessageDialog(this,
+                    "Votre panier est vide.",
+                    "Panier vide",
+                    javax.swing.JOptionPane.INFORMATION_MESSAGE);
+            }
+        });
+        panelAction.add(btnValiderCmd, BorderLayout.CENTER);
     }
 
 
@@ -256,44 +252,41 @@ public class FenetrePanier extends JDialog {
         
         double frais = 0.0;
         
-        // Les frais de port sont offerts dès 120 € d'achats pour TOUS les transporteurs
         if (total > 0 && total < 120.0) {
             int index = comboPort.getSelectedIndex();
             
-            if (index == 0) { // Colissimo
+            if (index == 0) {
                 if (total < 60.0) {
                     frais = 14.90;
                 } else if (total < 90.0) {
                     frais = 9.90;
-                } else { // entre 90 € et moins de 120 €
+                } else {
                     frais = 4.90;
                 }
             } 
-            else if (index == 1) { // Chronorelais
+            else if (index == 1) {
                 if (total < 60.0) {
                     frais = 14.90;
                 } else if (total < 90.0) {
                     frais = 9.90;
-                } else { // entre 90 € et moins de 120 €
+                } else {
                     frais = 4.90;
                 }
             } 
-            else if (index == 2) { // Chronofresh
+            else if (index == 2) {
                 if (total < 50.0) {
                     frais = 23.80;
                 } else if (total < 80.0) {
                     frais = 17.80;
-                } else { // entre 80 € et moins de 120 €
+                } else {
                     frais = 9.90;
                 }
             }
         }
         
-        // Si le panier est vide (total == 0), les frais restent à 0
         double totalFinal = (total == 0) ? 0.0 : total + frais;
         lblTotalTransport.setText(" TOTAL AVEC TRANSPORT : " + String.format("%.2f €", totalFinal));
         
-        // Rappel visuel de la formule dans l'IHM
         if (btnPanierMain != null) {
             btnPanierMain.setText("🛒 Gestion du panier (" + String.format("%.2f €", total) + ")");
             btnPanierMain.repaint();

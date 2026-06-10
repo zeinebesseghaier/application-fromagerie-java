@@ -23,12 +23,23 @@ public class PanierTest {
         // Permet de définir un montant de panier précis simplement via la quantité
         Fromage fromageFactice = new Fromage("Fromage de Test", "image_test.png");
         articleFactice = new Article(fromageFactice, "Portion", 1.00f, 1000);
+        
     }
 
     /**
      * Méthode utilitaire pour injecter un montant précis dans le panier
      */
     private void fixerMontantPanier(double montant) {
+        panier.getLignesCommande().clear();
+        panier.ajouterArticle(articleFactice, (int) montant);
+    }
+    
+    private void fixerMontantPanier1(double montant) {
+        // Restaurer le stock de l'article facticice avant de vider
+        for (LigneCommande lc : panier.getLignesCommande()) {
+            lc.getArticle().setQuantitéEnStock(
+                lc.getArticle().getQuantitéEnStock() + lc.getQuantité());
+        }
         panier.getLignesCommande().clear();
         panier.ajouterArticle(articleFactice, (int) montant);
     }

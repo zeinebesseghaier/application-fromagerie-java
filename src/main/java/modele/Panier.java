@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Panier {
-
+	
     private List<LigneCommande> lignesCommande;
 
     @Responsable("Zeineb ESSEGHAIER")
@@ -13,8 +13,15 @@ public class Panier {
         this.lignesCommande = new ArrayList<>();
     }
 
-    @Responsable("Zeineb ESSEGHAIER")
+    @Responsable("Zaynab BOULIFA")
     public void ajouterArticle(Article article, int quantité) {
+        for (LigneCommande lc : this.lignesCommande) {
+            if (lc.getArticle().equals(article)) {
+                lc.setQuantité(lc.getQuantité() + quantité);
+                article.setQuantitéEnStock(article.getQuantitéEnStock() - quantité);
+                return;
+            }
+        }
         article.setQuantitéEnStock(article.getQuantitéEnStock() - quantité);
         this.lignesCommande.add(new LigneCommande(article, quantité));
     }
