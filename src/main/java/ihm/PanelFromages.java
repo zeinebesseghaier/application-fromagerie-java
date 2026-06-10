@@ -74,6 +74,9 @@ public class PanelFromages extends JPanel {
     private JLabel lblStock;
     private JSpinner spinnerQuantité;
     private JButton btnAjouterPanier;
+    
+    // --- NOUVEAUTÉ : Référence au bouton du panier principal ---
+    private JButton btnPanierMain;
 
     // Article courant affiché
     private List<Article> articlesFromageCourant;
@@ -91,6 +94,11 @@ public class PanelFromages extends JPanel {
         this.panier = panier;
         initialiserComposants();
         chargerListe(base.getFromages());
+    }
+    
+    @Responsable("Zeineb ESSEGHAIER")
+    public void setBoutonPanier(JButton btn) {
+        this.btnPanierMain = btn;
     }
 
     @Responsable("Zeineb ESSEGHAIER")
@@ -146,9 +154,24 @@ public class PanelFromages extends JPanel {
             public java.awt.Component getListCellRendererComponent(
                     javax.swing.JList<?> list, Object value,
                     int index, boolean isSelected, boolean cellHasFocus) {
+                
                 super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+                
                 if (value instanceof Fromage) {
-                    setText("  " + ((Fromage) value).getDésignation());
+                    Fromage f = (Fromage) value;
+                    
+                    // Calcul du stock total pour ce fromage
+                    int stockTotal = f.getArticles().stream().mapToInt(Article::getQuantitéEnStock).sum();
+                    
+                    // Affichage simple et direct
+                    if (stockTotal <= 0) {
+                        setText(f.getDésignation() + " - rupture stock");
+                        setForeground(Color.RED); // Met tout en rouge si rupture
+                    } else {
+                        setText(f.getDésignation() + " - en stock");
+                        // Rétablit la couleur par défaut (noir ou celle de la sélection)
+                        setForeground(isSelected ? Color.GREEN : COULEUR_TEXTE);
+                    }
                 }
                 return this;
             }
@@ -404,22 +427,29 @@ public class PanelFromages extends JPanel {
         }
     }
 
-    @Responsable("Zeineb ESSEGHAIER")
+    @Responsable("Zeineb ESSEGHAIER & BOULIFA Zaynab")
     private void afficherArticle(Article article) {
         this.lblArticle.setText(article.toStringIHM());
         this.lblPrix.setText(String.format("%.2f €", article.getPrixTTC()));
+        
         int stock = article.getQuantitéEnStock();
-        this.lblStock.setText(String.valueOf(stock));
+        
+        // --- Vérification immédiate du stock ---
         if (stock > 0) {
+            this.lblStock.setText(String.valueOf(stock));
             this.spinnerQuantité.setModel(new SpinnerNumberModel(1, 1, stock, 1));
             this.btnAjouterPanier.setEnabled(true);
             this.btnAjouterPanier.setBackground(COULEUR_MARRON);
         } else {
+            // Affichage avec le texte rouge en petit
+            this.lblStock.setText("<html>0 &nbsp; <span style='color:#D32F2F; font-size:10px;'><i>rupture de stock</i></span></html>");
             this.spinnerQuantité.setModel(new SpinnerNumberModel(0, 0, 0, 1));
             this.btnAjouterPanier.setEnabled(false);
             this.btnAjouterPanier.setBackground(Color.GRAY);
         }
     }
+    
+    
 
     @Responsable("Zeineb ESSEGHAIER")
     private void chargerImage(String nomImage) {
@@ -455,17 +485,36 @@ public class PanelFromages extends JPanel {
         this.articlesFromageCourant = null;
     }
 
-    @Responsable("Zeineb ESSEGHAIER")
+    @Responsable("Zeineb ESSEGHAIER & Zaynab BOULIFA")
     private void ajouterAuPanier() {
-        if (this.articlesFromageCourant == null
-                || this.articlesFromageCourant.isEmpty()) {
+        if (this.articlesFromageCourant == null || this.articlesFromageCourant.isEmpty()) {
             return;
         }
         Article article = this.articlesFromageCourant.get(this.indexArticle);
         int quantité = (Integer) this.spinnerQuantité.getValue();
+        
+        // --- SÉCURITÉ STOCK LORS DE L'AJOUT MANUEL ---
+        if (quantité > article.getQuantitéEnStock()) {
+            javax.swing.JOptionPane.showMessageDialog(this, 
+                "Action impossible : Le stock restant est insuffisant (" + article.getQuantitéEnStock() + " disponible(s)).", 
+                "Rupture de Stock", 
+                javax.swing.JOptionPane.WARNING_MESSAGE);
+            return; 
+        }
+
         this.panier.ajouterArticle(article, quantité);
         afficherArticle(article);
+        
+        // Mise à jour du prix sur le bouton en direct ---
+        if (this.btnPanierMain != null) {
+            this.btnPanierMain.setText("🛒 Gestion du panier (" + String.format("%.2f €", this.panier.calculerTotalTTC()) + ")");
+       
+            javax.swing.SwingUtilities.getWindowAncestor(this).repaint();
+        }
+        
+        
     }
+
     /**
      * Permet de mettre à jour dynamiquement l'affichage du stock
      * lorsque les quantités bougent dans l'interface du panier.
@@ -481,5 +530,4 @@ public class PanelFromages extends JPanel {
             }
         }
     }
-    
 }
