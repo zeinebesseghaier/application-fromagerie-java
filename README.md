@@ -34,4 +34,4 @@ Projet réalisé en binôme dans le cadre du BUT Informatique (SAE S2.01, IUT Pa
 ## Autrices
 
 - Zeineb Esseghaier
-- PRÉNOM NOM DE TA BINÔME
+- Zaynab Boulifa
